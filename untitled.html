@@ -1,0 +1,1821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix</title>
+    <link href="https://fonts.googleapis.com/css2?family=Netflix+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Netflix Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #141414;
+            color: #ffffff;
+            overflow-x: hidden;
+            line-height: 1.4;
+        }
+
+        /* Netflix Header */
+        .netflix-header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: linear-gradient(180deg, rgba(0,0,0,0.7) 10%, transparent);
+            z-index: 1000;
+            padding: 0 4%;
+            transition: background-color 0.4s ease;
+        }
+
+        .netflix-header.scrolled {
+            background-color: #141414;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 68px;
+        }
+
+        .netflix-logo {
+            color: #e50914;
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-decoration: none;
+            letter-spacing: -0.05em;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 40px;
+            position: relative;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 12px 20px;
+            background: rgba(0,0,0,0.7);
+            border: 2px solid #333;
+            border-radius: 4px;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: #e50914;
+            background: rgba(0,0,0,0.9);
+        }
+
+        .search-bar::placeholder {
+            color: #999;
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #181818;
+            border-radius: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1001;
+            display: none;
+        }
+
+        .search-result-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #333;
+            transition: background 0.2s ease;
+        }
+
+        .search-result-item:hover {
+            background: #333;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .profile-icon {
+            width: 32px;
+            height: 32px;
+            background: #e50914;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            position: relative;
+            height: 80vh;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), 
+                            url('https://images.unsplash.com/photo-1489599162163-3fb2b8e4b5b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+        }
+
+        .hero-content {
+            max-width: 500px;
+            margin-left: 4%;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 15px;
+        }
+
+        .hero-description {
+            font-size: 1.4rem;
+            font-weight: 400;
+            line-height: 1.4;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .play-btn,
+        .info-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .play-btn {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        .play-btn:hover {
+            background-color: rgba(255,255,255,0.75);
+        }
+
+        .info-btn {
+            background-color: rgba(109,109,110,0.7);
+            color: #ffffff;
+        }
+
+        .info-btn:hover {
+            background-color: rgba(109,109,110,0.4);
+        }
+
+        /* Movies Grid */
+        .movies-section {
+            padding: 40px 4%;
+            background: #141414;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #e5e5e5;
+        }
+
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .movie-card {
+            background: #222;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .movie-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .movie-poster {
+            width: 100%;
+            height: 400px;
+            background: #333;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .movie-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .movie-card:hover .movie-poster img {
+            transform: scale(1.1);
+        }
+
+        .movie-info {
+            padding: 15px;
+        }
+
+        .movie-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .movie-meta {
+            display: flex;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: #999;
+            margin-bottom: 8px;
+        }
+
+        .movie-rating {
+            color: #46d369;
+            font-weight: 600;
+        }
+
+        .movie-description {
+            font-size: 0.85rem;
+            color: #ccc;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .quality-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.8);
+            color: #ffffff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Video Player Modal */
+        .video-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            max-width: 900px;
+            margin: 3% auto;
+            background: #181818;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #181818;
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: #333;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            background: #000;
+        }
+
+        .video-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .modal-info {
+            padding: 30px;
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .modal-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .modal-rating {
+            color: #46d369;
+            font-weight: 600;
+        }
+
+        .modal-year,
+        .modal-duration {
+            color: #777;
+        }
+
+        .modal-description {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #d2d2d2;
+            margin-bottom: 25px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .modal-play-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .modal-play-btn:hover {
+            background: rgba(255,255,255,0.75);
+        }
+
+        .modal-list-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(109,109,110,0.7);
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .modal-list-btn:hover {
+            background: rgba(109,109,110,0.4);
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3000;
+        }
+
+        .netflix-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #333;
+            border-top: 3px solid #e50914;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .movies-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .netflix-logo {
+                font-size: 2rem;
+            }
+            
+            .search-container {
+                margin: 0 20px;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-description {
+                font-size: 1.1rem;
+            }
+            
+            .movies-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .modal-content {
+                margin: 0;
+                border-radius: 0;
+                height: 100vh;
+            }
+            
+            .video-container {
+                height: 250px;
+            }
+            
+            .modal-info {
+                padding: 20px;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #141414;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-content {
+            animation: modalSlideIn 0.4s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* No results message */
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Netflix Header -->
+    <header class="netflix-header" id="header">
+        <div class="header-content">
+            <a href="#" class="netflix-logo" onclick="showAllMovies()">NETFLIX</a>
+            
+            <div class="search-container">
+                <input type="text" class="search-bar" id="search-bar" placeholder="Search movies..." oninput="searchMovies(this.value)">
+                <div class="search-results" id="search-results"></div>
+            </div>
+            
+            <div class="header-right">
+                <div class="profile-icon">U</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">Stranger Things</h1>
+            <p class="hero-description">
+                When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces, and one strange little girl.
+            </p>
+            <div class="hero-buttons">
+                <button class="play-btn" onclick="playFeaturedContent()">
+                    <svg style="width: 20px; height: 20px; fill: currentColor;" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                    Play
+                </button>
+                <button class="info-btn" onclick="showMovieInfo('stranger-things')">
+                    <svg style="width: 20px; height: 20px; fill: currentColor;" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                    </svg>
+                    More Info
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Movies Section -->
+    <section class="movies-section">
+        <h2 class="section-title" id="section-title">All Movies</h2>
+        <div class="movies-grid" id="movies-grid">
+            <!-- Movies will be loaded here -->
+        </div>
+        <div class="no-results" id="no-results" style="display: none;">
+            No movies found. Try a different search term.
+        </div>
+    </section>
+
+    <!-- Video Player Modal -->
+    <div class="video-modal" id="video-modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <div class="video-container" id="video-container">
+                <!-- Video will be loaded here -->
+            </div>
+            <div class="modal-info">
+                <h2 class="modal-title" id="modal-title">Movie Title</h2>
+                <div class="modal-meta">
+                    <span class="modal-rating" id="modal-rating">95% Match</span>
+                    <span class="modal-year" id="modal-year">2023</span>
+                    <span class="modal-duration" id="modal-duration">2h 30m</span>
+                </div>
+                <p class="modal-description" id="modal-description">
+                    Movie description will appear here...
+                </p>
+                <div class="modal-actions">
+                    <button class="modal-play-btn" onclick="playTrailer()">
+                        <svg style="width: 20px; height: 20px; fill: currentColor;" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                        Play Trailer
+                    </button>
+                    <button class="modal-list-btn" onclick="addToList()">
+                        <svg style="width: 20px; height: 20px; fill: currentColor;" viewBox="0 0 24 24">
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                        </svg>
+                        My List
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Animation -->
+    <div class="loading" id="loading">
+        <div class="netflix-spinner"></div>
+    </div>
+
+    <script>
+        // 100 Movies Database with Real Posters and YouTube Trailers
+        const moviesDatabase = [
+            {
+                id: 'stranger-things',
+                title: 'Stranger Things',
+                year: '2016',
+                rating: '96% Match',
+                duration: '4 Seasons',
+                description: 'When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces, and one strange little girl.',
+                trailerUrl: 'b9EkMc79ZSU',
+                poster: 'https://m.media-amazon.com/images/M/MV5BN2ZmYjg1YmItNWQ4OC00YWM0LWE0ZDktYThjOTZiZjhhN2Q2XkEyXkFqcGdeQXVyNjgxNTQ3Mjk@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'avengers-endgame',
+                title: 'Avengers: Endgame',
+                year: '2019',
+                rating: '94% Match',
+                duration: '3h 1m',
+                description: 'After the devastating events of Avengers: Infinity War, the universe is in ruins. With the help of remaining allies, the Avengers assemble once more.',
+                trailerUrl: 'TcMBFSGVi1c',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMTc5MDE2ODcwNV5BMl5BanBnXkFtZTgwMzI2NzQ2NzM@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'the-dark-knight',
+                title: 'The Dark Knight',
+                year: '2008',
+                rating: '96% Match',
+                duration: '2h 32m',
+                description: 'When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests.',
+                trailerUrl: 'EXeTwQWrcwY',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'inception',
+                title: 'Inception',
+                year: '2010',
+                rating: '94% Match',
+                duration: '2h 28m',
+                description: 'A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.',
+                trailerUrl: 'YoHD9XEInc0',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'interstellar',
+                title: 'Interstellar',
+                year: '2014',
+                rating: '93% Match',
+                duration: '2h 49m',
+                description: 'A team of explorers travel through a wormhole in space in an attempt to ensure humanity\'s survival.',
+                trailerUrl: 'zSWdZVtXT7E',
+                poster: 'https://m.media-amazon.com/images/M/MV5BZjdkOTU3MDktN2IxOS00OGEyLWFmMjktY2FiMmZkNWIyODZiXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'the-matrix',
+                title: 'The Matrix',
+                year: '1999',
+                rating: '92% Match',
+                duration: '2h 16m',
+                description: 'A computer programmer is led to fight an underground war against powerful computers who have constructed his entire reality with a system called the Matrix.',
+                trailerUrl: 'vKQi3bBA1y8',
+                poster: 'https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'pulp-fiction',
+                title: 'Pulp Fiction',
+                year: '1994',
+                rating: '94% Match',
+                duration: '2h 34m',
+                description: 'The lives of two mob hitmen, a boxer, a gangster and his wife, and a pair of diner bandits intertwine in four tales of violence and redemption.',
+                trailerUrl: 's7EdQ4FqbhY',
+                poster: 'https://m.media-amazon.com/images/M/MV5BNGNhMDIzZTUtNTBlZi00MTRlLWFjM2ItYzViMjE3YzI5MjljXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'the-godfather',
+                title: 'The Godfather',
+                year: '1972',
+                rating: '97% Match',
+                duration: '2h 55m',
+                description: 'The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.',
+                trailerUrl: 'sY1S34973zA',
+                poster: 'https://m.media-amazon.com/images/M/MV5BM2MyNjYxNmUtYTAwNi00MTYxLWJmNWYtYzZlODY3ZTk3OTFlXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'goodfellas',
+                title: 'Goodfellas',
+                year: '1990',
+                rating: '95% Match',
+                duration: '2h 26m',
+                description: 'The story of Henry Hill and his life in the mob, covering his relationship with his wife Karen Hill and his mob partners Jimmy Conway and Tommy DeVito.',
+                trailerUrl: 'qo5jJpHtI1Y',
+                poster: 'https://m.media-amazon.com/images/M/MV5BY2NkZjEzMDgtN2RjYy00YzM1LWI4ZmQtMjIwYjFjNmI3ZGEwXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'breaking-bad',
+                title: 'Breaking Bad',
+                year: '2008',
+                rating: '96% Match',
+                duration: '5 Seasons',
+                description: 'A high school chemistry teacher diagnosed with inoperable lung cancer turns to manufacturing and selling methamphetamine in order to secure his family\'s future.',
+                trailerUrl: 'HhesaQXLuRY',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMjhiMzgxZTctNDc1Ni00OTIxLTlhMTYtZTA3ZWFkODRkNmFmXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'game-of-thrones',
+                title: 'Game of Thrones',
+                year: '2011',
+                rating: '93% Match',
+                duration: '8 Seasons',
+                description: 'Nine noble families fight for control over the lands of Westeros, while an ancient enemy returns after being dormant for millennia.',
+                trailerUrl: 'rlR4PJn8b8I',
+                poster: 'https://m.media-amazon.com/images/M/MV5BYTRiNDQwYzAtMzVlZS00NTI5LWJjYjUtMzkwNTUzMWMxZTllXkEyXkFqcGdeQXVyNDIzMzcwNjc@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'the-office',
+                title: 'The Office',
+                year: '2005',
+                rating: '95% Match',
+                duration: '9 Seasons',
+                description: 'A mockumentary on a group of typical office workers, where the workday consists of ego clashes, inappropriate behavior, and tedium.',
+                trailerUrl: 'LHOtME2DL4g',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMDNkOTE4NDQtMTNmYi00MWE0LWE4ZTktYTc0NzhhNWIzNzJiXkEyXkFqcGdeQXVyMzQ2MDI5NjU@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'friends',
+                title: 'Friends',
+                year: '1994',
+                rating: '93% Match',
+                duration: '10 Seasons',
+                description: 'Follows the personal and professional lives of six twenty to thirty-something-year-old friends living in Manhattan.',
+                trailerUrl: 'hDNNmeeJs1Q',
+                poster: 'https://m.media-amazon.com/images/M/MV5BNDVkYjU0MzctMWRmZi00NTkxLTgwZWEtOWVhYjZlYjllYmU4XkEyXkFqcGdeQXVyNTA4NzY1MzY@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'titanic',
+                title: 'Titanic',
+                year: '1997',
+                rating: '91% Match',
+                duration: '3h 14m',
+                description: 'A seventeen-year-old aristocrat falls in love with a kind but poor artist aboard the luxurious, ill-fated R.M.S. Titanic.',
+                trailerUrl: 'kVrqfYjkFsE',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMDdmZGU3NDQtY2E5My00ZTliLWIzOTUtMTY4ZGI1YjdiNjk3XkEyXkFqcGdeQXVyNTA4NzY1MzY@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'avatar',
+                title: 'Avatar',
+                year: '2009',
+                rating: '89% Match',
+                duration: '2h 42m',
+                description: 'A paraplegic Marine dispatched to the moon Pandora on a unique mission becomes torn between following his orders and protecting the world he feels is his home.',
+                trailerUrl: '5PSNL1qE6VY',
+                poster: 'https://m.media-amazon.com/images/M/MV5BZDA0OGQxNTItMDZkMC00N2UyLTg3MzMtYTJmNjg3Nzk5MzRiXkEyXkFqcGdeQXVyMjUzOTY1NTc@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'spider-man-no-way-home',
+                title: 'Spider-Man: No Way Home',
+                year: '2021',
+                rating: '92% Match',
+                duration: '2h 28m',
+                description: 'With Spider-Man\'s identity now revealed, Peter asks Doctor Strange for help. When a spell goes wrong, dangerous foes from other worlds start to appear.',
+                trailerUrl: 'JfVOs4VSpmA',
+                poster: 'https://m.media-amazon.com/images/M/MV5BZWMyYzFjYTYtNTRjYi00OGExLWE2YzgtOGRmYjAxZTU3NzBiXkEyXkFqcGdeQXVyMzQ0MzA0NTM@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'top-gun-maverick',
+                title: 'Top Gun: Maverick',
+                year: '2022',
+                rating: '91% Match',
+                duration: '2h 11m',
+                description: 'After thirty years, Maverick is still pushing the envelope as a top naval aviator, but must confront ghosts of his past when he leads TOP GUN\'s elite graduates on a mission.',
+                trailerUrl: 'giXco2jaZ_4',
+                poster: 'https://m.media-amazon.com/images/M/MV5BZWYzOGEwNTgtNWU3NS00ZTQ0LWJkODUtMmVhMjIwMjA1ZmQwXkEyXkFqcGdeQXVyMjkwOTAyMDU@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'black-panther',
+                title: 'Black Panther',
+                year: '2018',
+                rating: '90% Match',
+                duration: '2h 14m',
+                description: 'T\'Challa, heir to the hidden but advanced kingdom of Wakanda, must step forward to lead his people into a new future and must confront a challenger from his country\'s past.',
+                trailerUrl: 'xjDjIWPwcPU',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMTg1MTY2MjYzNV5BMl5BanBnXkFtZTgwMTc4NTMwNDI@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'joker',
+                title: 'Joker',
+                year: '2019',
+                rating: '89% Match',
+                duration: '2h 2m',
+                description: 'In Gotham City, mentally troubled comedian Arthur Fleck is disregarded and mistreated by society. He then embarks on a downward spiral of revolution and bloody crime.',
+                trailerUrl: 'zAGVQLHvwOY',
+                poster: 'https://m.media-amazon.com/images/M/MV5BNGVjNWI4ZGUtNzE0MS00YTJmLWE0ZDctN2ZiYTk2YmI3NTYyXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'dune',
+                title: 'Dune',
+                year: '2021',
+                rating: '90% Match',
+                duration: '2h 35m',
+                description: 'Feature adaptation of Frank Herbert\'s science fiction novel about the son of a noble family entrusted with the protection of the most valuable asset.',
+                trailerUrl: '8g18jFHCLXk',
+                poster: 'https://m.media-amazon.com/images/M/MV5BN2FjNmEyNWMtYzM0ZS00NjIyLTg5YzYtYThlMGVjNzE1OGViXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'the-batman',
+                title: 'The Batman',
+                year: '2022',
+                rating: '88% Match',
+                duration: '2h 56m',
+                description: 'When the Riddler, a sadistic serial killer, begins murdering key political figures in Gotham, Batman is forced to investigate the city\'s hidden corruption.',
+                trailerUrl: 'mqqft2x_Aa4',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMDdmMTBiNTYtMDIzNi00NGVlLWIzMDYtZTk3MTQ3NGQxZGEwXkEyXkFqcGdeQXVyMzMwOTU5MDk@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'no-time-to-die',
+                title: 'No Time to Die',
+                year: '2021',
+                rating: '87% Match',
+                duration: '2h 43m',
+                description: 'James Bond has left active service. His peace is short-lived when Felix Leiter, an old friend from the CIA, turns up asking for help.',
+                trailerUrl: 'BIhNsAtPbPI',
+                poster: 'https://m.media-amazon.com/images/M/MV5BYWQ2NzQ1NjktMzNkNS00MGY1LTgwMmMtYTllYTI5YzNmMmE0XkEyXkFqcGdeQXVyMjM4NTM5NDY@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'fast-x',
+                title: 'Fast X',
+                year: '2023',
+                rating: '85% Match',
+                duration: '2h 21m',
+                description: 'Dom Toretto and his family are targeted by the vengeful son of drug kingpin Hernan Reyes.',
+                trailerUrl: '32RAq6JzY-w',
+                poster: 'https://m.media-amazon.com/images/M/MV5BNzVlYmY2ZmQtZWFhZi00MzEyLTgzMzUtMzllMDI0NzUyNDkwXkEyXkFqcGdeQXVyMTUzMTg2ODkz@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'john-wick-4',
+                title: 'John Wick: Chapter 4',
+                year: '2023',
+                rating: '89% Match',
+                duration: '2h 49m',
+                description: 'John Wick uncovers a path to defeating The High Table. But before he can earn his freedom, Wick must face off against a new enemy with powerful alliances.',
+                trailerUrl: 'qEVUtrk8_B4',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMDExZGMyOTMtMDgyYi00NGIwLWJhMTEtOTdkZGFjNmZiMTEwXkEyXkFqcGdeQXVyMjM4NTM5NDY@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'oppenheimer',
+                title: 'Oppenheimer',
+                year: '2023',
+                rating: '93% Match',
+                duration: '3h',
+                description: 'The story of American scientist J. Robert Oppenheimer and his role in the development of the atomic bomb.',
+                trailerUrl: 'bK6ldnjE3Y0',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMDBmYTZjNjUtN2M1MS00MTQ2LTk2ODgtNzc2M2QyZGE5NTVjXkEyXkFqcGdeQXVyNzAwMjU2MTY@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'barbie',
+                title: 'Barbie',
+                year: '2023',
+                rating: '88% Match',
+                duration: '1h 54m',
+                description: 'Barbie and Ken are having the time of their lives in the colorful and seemingly perfect world of Barbie Land. However, when they get a chance to go to the real world, they soon discover the joys and perils of living among humans.',
+                trailerUrl: 'pBk4NYhWNMM',
+                poster: 'https://m.media-amazon.com/images/M/MV5BNjU3N2QxNzYtMjk1NC00MTc4LTk1NTQtMmUxNTljM2I0NDA5XkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'guardians-galaxy-3',
+                title: 'Guardians of the Galaxy Vol. 3',
+                year: '2023',
+                rating: '87% Match',
+                duration: '2h 30m',
+                description: 'Still reeling from the loss of Gamora, Peter Quill must rally his team to defend the universe and protect one of their own.',
+                trailerUrl: 'u3V5KDHRQvk',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMDgxOTdjMzYtZGQxMS00ZTAzLWI4Y2UtMTQzN2VlYjYyZWRiXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'indiana-jones-5',
+                title: 'Indiana Jones and the Dial of Destiny',
+                year: '2023',
+                rating: '84% Match',
+                duration: '2h 34m',
+                description: 'Archaeologist Indiana Jones races against time to retrieve a legendary artifact that can change the course of history.',
+                trailerUrl: 'ZVuToMilP0A',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMjIxMzk1NjkzNl5BMl5BanBnXkFtZTgwNzM4MjI4NjE@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'mission-impossible-7',
+                title: 'Mission: Impossible – Dead Reckoning Part One',
+                year: '2023',
+                rating: '86% Match',
+                duration: '2h 43m',
+                description: 'Ethan Hunt and his IMF team embark on their most dangerous mission yet: To track down a terrifying new weapon that threatens all of humanity.',
+                trailerUrl: 'avz06PDqDbM',
+                poster: 'https://m.media-amazon.com/images/M/MV5BYzFiZjc1YzctMDY3Zi00NGE5LTlmNWEtN2Q3OWFjYjY1NGM2XkEyXkFqcGdeQXVyMTUyMTUzNjQ0@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'transformers-rise',
+                title: 'Transformers: Rise of the Beasts',
+                year: '2023',
+                rating: '83% Match',
+                duration: '2h 7m',
+                description: 'During the \'90s, a new faction of Transformers - the Maximals - join the Autobots as allies in the battle for Earth.',
+                trailerUrl: 'itnqEauWQZM',
+                poster: 'https://m.media-amazon.com/images/M/MV5BZTI5ZWNlYjEtMmJmYS00YWNhLWI4MzEtZDIxNDNmOGZjYzNkXkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'the-flash',
+                title: 'The Flash',
+                year: '2023',
+                rating: '82% Match',
+                duration: '2h 24m',
+                description: 'Barry Allen uses his super speed to change the past, but his attempt to save his family creates a world without super heroes, forcing him to race for his life.',
+                trailerUrl: 'hebWYacbdvc',
+                poster: 'https://m.media-amazon.com/images/M/MV5BYWIzMDM4YWYtNjA3Ny00MzY0LTgzOTYtYmFkN2Y4ODM1MTA2XkEyXkFqcGdeQXVyMTUzMTg2ODkz@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'ant-man-3',
+                title: 'Ant-Man and the Wasp: Quantumania',
+                year: '2023',
+                rating: '81% Match',
+                duration: '2h 5m',
+                description: 'Scott Lang and Hope Van Dyne are dragged into the Quantum Realm, along with Hope\'s parents and Scott\'s daughter Cassie.',
+                trailerUrl: 'ZlNFpri-Y40',
+                poster: 'https://m.media-amazon.com/images/M/MV5BODZhNzlmOGItMWUyYS00Y2Q5LWFlNzMtM2I2NDFkM2ZkYmE1XkEyXkFqcGdeQXVyMTU5OTA4NTIz@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'scream-6',
+                title: 'Scream VI',
+                year: '2023',
+                rating: '80% Match',
+                duration: '2h 3m',
+                description: 'The survivors of the Ghostface killings leave Woodsboro behind and start a fresh chapter in New York City.',
+                trailerUrl: 'h74AXqw4Opc',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMjM0NTc0NzQtODQ3MS00YTM3LTk0ZmUtYTkzYWE0YjVjOTVhXkEyXkFqcGdeQXVyMTM1MTE1NDMx@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'evil-dead-rise',
+                title: 'Evil Dead Rise',
+                year: '2023',
+                rating: '79% Match',
+                duration: '1h 36m',
+                description: 'A twisted tale of two estranged sisters whose reunion is cut short by the rise of flesh-possessing demons, thrusting them into a primal battle for survival.',
+                trailerUrl: 'BuPmq7yjDnI',
+                poster: 'https://m.media-amazon.com/images/M/MV5BNTQzMzc4MjItOWY5Ni00NmZhLWI0NzUtMWQ4ZGY2YmFmNzMxXkEyXkFqcGdeQXVyMTM1MTE1NDMx@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'cocaine-bear',
+                title: 'Cocaine Bear',
+                year: '2023',
+                rating: '78% Match',
+                duration: '1h 35m',
+                description: 'An oddball group of cops, criminals, tourists and teens converge on a Georgia forest where a huge black bear goes on a murderous rampage after unintentionally ingesting cocaine.',
+                trailerUrl: 'DuKOWBNqBGU',
+                poster: 'https://m.media-amazon.com/images/M/MV5BNTE2ODg3NzEtNmVhNy00NTY0LWI4ZGMtNjJmOGU2NjgxOGE5XkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'creed-3',
+                title: 'Creed III',
+                year: '2023',
+                rating: '85% Match',
+                duration: '1h 56m',
+                description: 'Adonis has been thriving in both his career and family life, but when a childhood friend and former boxing prodigy resurfaces, the face-off is more than just a fight.',
+                trailerUrl: 'AHmCH7iB_IM',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMmI1NzNhYjctMjkxZC00YzkwLWJiNGMtZTU4NWQ5NDY5YWZlXkEyXkFqcGdeQXVyMTUzMTg2ODkz@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'avatar-2',
+                title: 'Avatar: The Way of Water',
+                year: '2022',
+                rating: '88% Match',
+                duration: '3h 12m',
+                description: 'Jake Sully lives with his newfound family formed on the extrasolar moon Pandora. Once a familiar threat returns to finish what was previously started, Jake must work with Neytiri and the army of the Na\'vi race to protect their home.',
+                trailerUrl: 'd9MyW72ELq0',
+                poster: 'https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctY2ZiOC00YjVlLWFlNzAtNTVhNzM1YjI1NzMxXkEyXkFqcGdeQXVyMjQxNTE1MDA@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'wakanda-forever',
+                title: 'Black Panther: Wakanda Forever',
+                year: '2022',
+                rating: '86% Match',
+                duration: '2h 41m',
+                description: 'The people of Wakanda fight to protect their home from intervening world powers as they mourn the death of King T\'Challa.',
+                trailerUrl: '_Z3QKkl1WyM',
+                poster: 'https://m.media-amazon.com/images/M/MV5BNTM4NjIxNmEtYWE5NS00NDczLTkyNWQtYThhNmQyZGQzMjM0XkEyXkFqcGdeQXVyODk4OTc3MTY@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'thor-4',
+                title: 'Thor: Love and Thunder',
+                year: '2022',
+                rating: '84% Match',
+                duration: '1h 59m',
+                description: 'Thor enlists the help of Valkyrie, Korg and ex-girlfriend Jane Foster to fight Gorr the God Butcher, who intends to make the gods extinct.',
+                trailerUrl: 'Go8nTmfrQd8',
+                poster: 'https://m.media-amazon.com/images/M/MV5BYmMxZWRiMTgtZjM0Ny00NDQxLWIxYWQtZDdlNDNkOTEzYTdlXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'minions-2',
+                title: 'Minions: The Rise of Gru',
+                year: '2022',
+                rating: '83% Match',
+                duration: '1h 27m',
+                description: 'The untold story of one twelve-year-old\'s dream to become the world\'s greatest supervillain.',
+                trailerUrl: 'BqUsXZd4zf4',
+                poster: 'https://m.media-amazon.com/images/M/MV5BNjAyNDZjMjAtMmM2Yi00MTg4LWE3OTMtMjExMzNkNGE5YzNjXkEyXkFqcGdeQXVyMTEwMTQ4MzU5@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'doctor-strange-2',
+                title: 'Doctor Strange in the Multiverse of Madness',
+                year: '2022',
+                rating: '85% Match',
+                duration: '2h 6m',
+                description: 'Doctor Strange teams up with a mysterious teenage girl from his dreams who can travel across multiverses, to battle multiple threats.',
+                trailerUrl: 'aWzlQ2N6qqg',
+                poster: 'https://m.media-amazon.com/images/M/MV5BNWM0ZGJlMzMtZmYwMi00NzI3LTgzMzMtNjMzNjliNDRmZmFlXkEyXkFqcGdeQXVyMTM1MTE1NDMx@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'jurassic-world-3',
+                title: 'Jurassic World Dominion',
+                year: '2022',
+                rating: '82% Match',
+                duration: '2h 27m',
+                description: 'Four years after the destruction of Isla Nublar, dinosaurs now live and hunt alongside humans all over the world.',
+                trailerUrl: 'fb5ELWi-ekk',
+                poster: 'https://m.media-amazon.com/images/M/MV5BNzRiMjg0MzUtNTQ1Mi00Y2Q5LWEwM2MtMzUwZDU5NmVjN2NkXkEyXkFqcGdeQXVyMjM4NTM5NDY@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'lightyear',
+                title: 'Lightyear',
+                year: '2022',
+                rating: '81% Match',
+                duration: '1h 45m',
+                description: 'The story of Buzz Lightyear and his adventures to infinity and beyond.',
+                trailerUrl: 'BwPL0Md_QFQ',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMDdkYzBjYzAtMGI0OC00OTM0LWJjNzYtMGZmNzNmODU4NTQ3XkEyXkFqcGdeQXVyMTM1MTE1NDMx@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'elvis',
+                title: 'Elvis',
+                year: '2022',
+                rating: '87% Match',
+                duration: '2h 39m',
+                description: 'The life story of Elvis Presley as seen through the complicated relationship with his enigmatic manager, Colonel Tom Parker.',
+                trailerUrl: 'wS3-kLZ5D9Y',
+                poster: 'https://m.media-amazon.com/images/M/MV5BYmFiZGZjYTItYzQzOS00YWY4LTk4ODEtNjJlNTYzNjUxNTBmXkEyXkFqcGdeQXVyMTEyMjM2NDc2@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'morbius',
+                title: 'Morbius',
+                year: '2022',
+                rating: '76% Match',
+                duration: '1h 44m',
+                description: 'Biochemist Michael Morbius tries to cure himself of a rare blood disease, but he inadvertently infects himself with a form of vampirism instead.',
+                trailerUrl: 'oZ6iiRrz1SY',
+                poster: 'https://m.media-amazon.com/images/M/MV5BYWNiM2Y4YWYtZGI3ZC00NGRhLWIzMDQtN2QwM2ZlYWYyNzNlXkEyXkFqcGdeQXVyMTM1MTE1NDMx@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'sonic-2',
+                title: 'Sonic the Hedgehog 2',
+                year: '2022',
+                rating: '84% Match',
+                duration: '2h 2m',
+                description: 'When the manic Dr. Robotnik returns with a new partner, Knuckles, in search of an emerald that has the power to destroy civilizations, Sonic teams up with his own sidekick, Tails.',
+                trailerUrl: 'G5kzUpWAusI',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMjBkN2FkNWQtMjAzYi00MzE4LTkxNzAtYjg1NGNjZmNhZGIyXkEyXkFqcGdeQXVyMTEyMjM2NDc2@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'the-northman',
+                title: 'The Northman',
+                year: '2022',
+                rating: '86% Match',
+                duration: '2h 17m',
+                description: 'From visionary director Robert Eggers comes The Northman, an action-filled epic that follows a young Viking prince on his quest to avenge his father\'s murder.',
+                trailerUrl: 'oMSdFM12hOw',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMzVlMmY2NTctODgwOC00NDMzLWEzMWYtM2RiYmIyNTNhMTI0XkEyXkFqcGdeQXVyNTAzNzgwNTg@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'everything-everywhere',
+                title: 'Everything Everywhere All at Once',
+                year: '2022',
+                rating: '92% Match',
+                duration: '2h 19m',
+                description: 'An aging Chinese immigrant is swept up in an insane adventure, where she alone can save what\'s important to her by connecting with the lives she could have led.',
+                trailerUrl: 'wxN1T1uxQ2g',
+                poster: 'https://m.media-amazon.com/images/M/MV5BYTdiOTIyZTQtNmQ1OS00NjZlLWIyMTgtYzk5Y2M3ZDVmMDk1XkEyXkFqcGdeQXVyMTAzMDg4NzU0@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'turning-red',
+                title: 'Turning Red',
+                year: '2022',
+                rating: '83% Match',
+                duration: '1h 40m',
+                description: 'A thirteen-year-old girl named Mei Lee is torn between staying her mother\'s dutiful daughter and the changes of adolescence.',
+                trailerUrl: 'XdKzUbAiswE',
+                poster: 'https://m.media-amazon.com/images/M/MV5BNjY0MGEzZmQtZWMxNi00MWVhLWI4NWEtYjQ0MDkyYTJhMDU0XkEyXkFqcGdeQXVyODc0OTEyNDU@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'encanto',
+                title: 'Encanto',
+                year: '2021',
+                rating: '89% Match',
+                duration: '1h 42m',
+                description: 'A Colombian teenage girl has to face the frustration of being the only member of her family without magical powers.',
+                trailerUrl: 'CaimKeDcudo',
+                poster: 'https://m.media-amazon.com/images/M/MV5BNjE5NzA4ZDctOTJkZi00NzM0LTkwOTYtMDI4MmNkMzIxODhkXkEyXkFqcGdeQXVyNjY1MTg4Mzc@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'eternals',
+                title: 'Eternals',
+                year: '2021',
+                rating: '78% Match',
+                duration: '2h 37m',
+                description: 'The saga of the Eternals, a race of immortal beings who lived on Earth and shaped its history and civilizations.',
+                trailerUrl: 'x_me3xsvDgk',
+                poster: 'https://m.media-amazon.com/images/M/MV5BY2Y1ODBhNzAtNzgzYS00ZWE2LWJmMWItYWVlMjdmYWQwNTJjXkEyXkFqcGdeQXVyMTEyMjM2NDc2@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'shang-chi',
+                title: 'Shang-Chi and the Legend of the Ten Rings',
+                year: '2021',
+                rating: '87% Match',
+                duration: '2h 12m',
+                description: 'Shang-Chi, the master of weaponry-based Kung Fu, is forced to confront his past after being drawn into the Ten Rings organization.',
+                trailerUrl: '8YjFbMbfXaQ',
+                poster: 'https://m.media-amazon.com/images/M/MV5BNTliYjlkNDQtMjFlNS00NjgzLWFmMWEtYmM2Mzc2Zjg3ZjEyXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'venom-2',
+                title: 'Venom: Let There Be Carnage',
+                year: '2021',
+                rating: '82% Match',
+                duration: '1h 37m',
+                description: 'Eddie Brock attempts to reignite his career by interviewing serial killer Cletus Kasady, who becomes the host of the symbiote Carnage.',
+                trailerUrl: '-FmWuCgJmxo',
+                poster: 'https://m.media-amazon.com/images/M/MV5BOTBmZWQ3ODctOWY4Ni00NTNkLWE5YzEtYWQ0NzBkNDM4OTRjXkEyXkFqcGdeQXVyMTEyMjM2NDc2@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'matrix-4',
+                title: 'The Matrix Resurrections',
+                year: '2021',
+                rating: '79% Match',
+                duration: '2h 28m',
+                description: 'Return to a world of two realities: one, everyday life; the other, what lies behind it.',
+                trailerUrl: '9ix7TUGVYIo',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMGJkNDJlZWUtOGM1Ny00YjNkLThiM2QtY2ZjMzQxMTIxNWNmXkEyXkFqcGdeQXVyMDM2NDM2MQ@@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'dune-2021',
+                title: 'Dune',
+                year: '2021',
+                rating: '90% Match',
+                duration: '2h 35m',
+                description: 'Paul Atreides, a brilliant and gifted young man born into a great destiny beyond his understanding, must travel to the most dangerous planet in the universe.',
+                trailerUrl: '8g18jFHCLXk',
+                poster: 'https://m.media-amazon.com/images/M/MV5BN2FjNmEyNWMtYzM0ZS00NjIyLTg5YzYtYThlMGVjNzE1OGViXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'free-guy',
+                title: 'Free Guy',
+                year: '2021',
+                rating: '85% Match',
+                duration: '1h 55m',
+                description: 'A bank teller discovers that he\'s actually an NPC inside a brutal, open world video game.',
+                trailerUrl: 'X2m-08cOAbc',
+                poster: 'https://m.media-amazon.com/images/M/MV5BOTY2NzFjODctOWUzMC00MGZhLTlhNjMtM2Y2ODBiNGY1ZWRiXkEyXkFqcGdeQXVyMDM2NDM2MQ@@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'jungle-cruise',
+                title: 'Jungle Cruise',
+                year: '2021',
+                rating: '83% Match',
+                duration: '2h 7m',
+                description: 'Based on Disneyland\'s theme park ride where a small riverboat takes a group of travelers through a jungle filled with dangerous animals and reptiles.',
+                trailerUrl: 'f_HvoipFcA8',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMjIwNjkzMzc1M15BMl5BanBnXkFtZTgwMTEzMzQ2NjE@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'cruella',
+                title: 'Cruella',
+                year: '2021',
+                rating: '86% Match',
+                duration: '2h 14m',
+                description: 'A live-action prequel feature film following a young Cruella de Vil.',
+                trailerUrl: 'gmRKv7n2If8',
+                poster: 'https://m.media-amazon.com/images/M/MV5BZDVkZmI0YzAtNzdjYi00ZjhhLWI4M2ItMzFjNTUxMDQzNDVlXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'black-widow',
+                title: 'Black Widow',
+                year: '2021',
+                rating: '84% Match',
+                duration: '2h 14m',
+                description: 'Natasha Romanoff confronts the darker parts of her ledger when a dangerous conspiracy with ties to her past arises.',
+                trailerUrl: 'Fp9pNPdNwjI',
+                poster: 'https://m.media-amazon.com/images/M/MV5BNjRmNDI5MjMtMmFhZi00YzcwLWI4ZGItMGI2MjI0N2Q3YmIwXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'fast-9',
+                title: 'F9: The Fast Saga',
+                year: '2021',
+                rating: '81% Match',
+                duration: '2h 23m',
+                description: 'Dom and the crew must take on an international terrorist who turns out to be Dom and Mia\'s estranged brother.',
+                trailerUrl: 'FUK2kdPsBws',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMjI0NmFkYzEtNzU2YS00NTg5LWIwYmMtNmQ1MTU0OGJjOTMxXkEyXkFqcGdeQXVyMjMxOTE0ODA@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'godzilla-vs-kong',
+                title: 'Godzilla vs. Kong',
+                year: '2021',
+                rating: '80% Match',
+                duration: '1h 53m',
+                description: 'The epic next chapter in the cinematic Monsterverse pits two of the greatest icons in motion picture history against one another.',
+                trailerUrl: 'odM92ap8_c0',
+                poster: 'https://m.media-amazon.com/images/M/MV5BZmYzMzU4NjctNDI0Mi00MGExLWI3ZDQtYzQzYThmYzc2ZmNjXkEyXkFqcGdeQXVyMTEyMjM2NDc2@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'mortal-kombat',
+                title: 'Mortal Kombat',
+                year: '2021',
+                rating: '78% Match',
+                duration: '1h 50m',
+                description: 'MMA fighter Cole Young seeks out Earth\'s greatest champions in order to stand against the enemies of Outworld in a high stakes battle for the universe.',
+                trailerUrl: 'NYH2sLid0Zc',
+                poster: 'https://m.media-amazon.com/images/M/MV5BY2ZlNWIxODMtN2YwZi00ZjNmLWIyN2UtZTFkYmZkNDQyNTAyXkEyXkFqcGdeQXVyODkzNTgxMDg@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'nobody',
+                title: 'Nobody',
+                year: '2021',
+                rating: '87% Match',
+                duration: '1h 32m',
+                description: 'A bystander who intervenes to help a woman being harassed by a group of men becomes the target of a vengeful drug lord.',
+                trailerUrl: 'wZti8QKBWPo',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMjM2NDkxMTgxNF5BMl5BanBnXkFtZTgwNDA1NzE4NjE@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'the-suicide-squad',
+                title: 'The Suicide Squad',
+                year: '2021',
+                rating: '88% Match',
+                duration: '2h 12m',
+                description: 'Supervillains Harley Quinn, Bloodsport, Peacemaker and a collection of nutty cons at Belle Reve prison join the super-secret, super-shady Task Force X.',
+                trailerUrl: 'eg5ciqQzmK0',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMTA3MDY0NjE2NDVeQTJeQWpwZ15BbWU4MDkxMTcyNzQz@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'space-jam-2',
+                title: 'Space Jam: A New Legacy',
+                year: '2021',
+                rating: '77% Match',
+                duration: '1h 55m',
+                description: 'A rogue artificial intelligence kidnaps the son of famed basketball player LeBron James, who then has to work with Bugs Bunny to win a basketball game.',
+                trailerUrl: '3if9DXBzLwk',
+                poster: 'https://m.media-amazon.com/images/M/MV5BNjRiNWE3N2EtMzQ5MS00M2M1LWI4NTMtMjhiYmZhMWJkZTU4XkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'luca',
+                title: 'Luca',
+                year: '2021',
+                rating: '85% Match',
+                duration: '1h 35m',
+                description: 'On the Italian Riviera, an unlikely but strong friendship grows between a human being and a sea monster disguised as a human.',
+                trailerUrl: 'mYfJxlgR2jw',
+                poster: 'https://m.media-amazon.com/images/M/MV5BZTQyNTU0MDktYTFkYi00ZjNhLWE2ODctMzBkM2U1ZTk3YTMzXkEyXkFqcGdeQXVyNTI4MzE4MDU@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'soul',
+                title: 'Soul',
+                year: '2020',
+                rating: '91% Match',
+                duration: '1h 40m',
+                description: 'A musician who has lost his passion for music is transported out of his body and must find his way back with the help of an infant soul learning about herself.',
+                trailerUrl: 'xOsLIiBStEs',
+                poster: 'https://m.media-amazon.com/images/M/MV5BZGE1MDg5M2MtNTkyZS00MTY5LTg1YzUtZTlhZmM1Y2EwNmFmXkEyXkFqcGdeQXVyNjA3OTI0MDc@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'wonder-woman-1984',
+                title: 'Wonder Woman 1984',
+                year: '2020',
+                rating: '82% Match',
+                duration: '2h 31m',
+                description: 'Diana must contend with a work colleague and businessman, whose desire for extreme wealth sends the world down a path of destruction.',
+                trailerUrl: 'sfM7_JLk-84',
+                poster: 'https://m.media-amazon.com/images/M/MV5BYTlhNzJjYzYtNGU3My00ZDI5LTgzZDUtYzllYjU1ZmU0YTgwXkEyXkFqcGdeQXVyMjQwMDg0Ng@@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'mulan',
+                title: 'Mulan',
+                year: '2020',
+                rating: '80% Match',
+                duration: '1h 55m',
+                description: 'A young Chinese maiden disguises herself as a male warrior in order to save her father.',
+                trailerUrl: 'KK8FHdFluOQ',
+                poster: 'https://m.media-amazon.com/images/M/MV5BNzE1NTMwNzYtNWYyMi00ODNhLWEwNGItZDVhNzgyNzk2YTcxXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'tenet',
+                title: 'Tenet',
+                year: '2020',
+                rating: '86% Match',
+                duration: '2h 30m',
+                description: 'Armed with only one word, Tenet, and fighting for the survival of the entire world, a Protagonist journeys through a twilight world of international espionage.',
+                trailerUrl: 'LdOM0x0XDMo',
+                poster: 'https://m.media-amazon.com/images/M/MV5BYzg0NGM2NjAtNmIxOC00MDJmLTg5ZmYtYzM0MTE4NWE2NzlhXkEyXkFqcGdeQXVyMTA4NjE0NjEy@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'onward',
+                title: 'Onward',
+                year: '2020',
+                rating: '84% Match',
+                duration: '1h 42m',
+                description: 'Two elven brothers embark on a quest to bring their father back for one day.',
+                trailerUrl: 'x8DKg_fsacM',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMTZlYzk3NzQtMmViYS00YWZmLTk5ZTEtNWE0NGVjM2MzYWU1XkEyXkFqcGdeQXVyNDg4NjY5OTQ@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: '1917',
+                title: '1917',
+                year: '2019',
+                rating: '93% Match',
+                duration: '1h 59m',
+                description: 'Two British soldiers are tasked with delivering an important message to call off a doomed attack during World War I.',
+                trailerUrl: 'YqNYrYUiMfg',
+                poster: 'https://m.media-amazon.com/images/M/MV5BOTdmNTFjNDEtNzg0My00ZjkxLTg1ZDAtZTdkMDc2ZmFiNWQ1XkEyXkFqcGdeQXVyNTAzNzgwNTg@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'parasite',
+                title: 'Parasite',
+                year: '2019',
+                rating: '95% Match',
+                duration: '2h 12m',
+                description: 'A poor family schemes to become employed by a wealthy family and infiltrate their household by posing as unrelated, highly qualified individuals.',
+                trailerUrl: '5xH0HfJHsaY',
+                poster: 'https://m.media-amazon.com/images/M/MV5BYWZjMjk3ZTItODQ2ZC00NTY5LWE0ZDYtZTI3MjcwN2Q5NTVkXkEyXkFqcGdeQXVyODk4OTc3MTY@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'once-upon-a-time-hollywood',
+                title: 'Once Upon a Time in Hollywood',
+                year: '2019',
+                rating: '89% Match',
+                duration: '2h 41m',
+                description: 'A faded television actor and his stunt double strive to achieve fame and success in the final years of Hollywood\'s Golden Age in 1969 Los Angeles.',
+                trailerUrl: 'ELeMaP8EPAA',
+                poster: 'https://m.media-amazon.com/images/M/MV5BOTg4ZTNkZmUtMzNlZi00YmFjLTk1MmUtNWQwNTM0YjcyNTNkXkEyXkFqcGdeQXVyNjg2NjQwMDQ@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'ford-v-ferrari',
+                title: 'Ford v Ferrari',
+                year: '2019',
+                rating: '88% Match',
+                duration: '2h 32m',
+                description: 'American car designer Carroll Shelby and driver Ken Miles battle corporate interference and the laws of physics to build a revolutionary race car for Ford.',
+                trailerUrl: 'zyYgDtY2AMY',
+                poster: 'https://m.media-amazon.com/images/M/MV5BM2QzM2JiNTMtOGU3Zi00NGIyLTgyYmQtMzg2Yzc3Njk4NjY4XkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'knives-out',
+                title: 'Knives Out',
+                year: '2019',
+                rating: '90% Match',
+                duration: '2h 10m',
+                description: 'A detective investigates the death of a patriarch of an eccentric, combative family.',
+                trailerUrl: 'qGqiHJTsRkQ',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMGUwZjliMTAtNzAxZi00MWNiLWE2NzgtZGUxMGQxZjhhNDRiXkEyXkFqcGdeQXVyNjU1NzU3MzE@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'toy-story-4',
+                title: 'Toy Story 4',
+                year: '2019',
+                rating: '87% Match',
+                duration: '1h 40m',
+                description: 'When a new toy called "Forky" joins Woody and the gang, a road trip alongside old and new friends reveals how big the world can be for a toy.',
+                trailerUrl: 'wmiIUN-7qhE',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMTYzMDM4NzkxOV5BMl5BanBnXkFtZTgwNzM1Mzg2NzM@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'lion-king-2019',
+                title: 'The Lion King',
+                year: '2019',
+                rating: '83% Match',
+                duration: '1h 58m',
+                description: 'After the murder of his father, a young lion prince flees his kingdom only to learn the true meaning of responsibility and bravery.',
+                trailerUrl: '4sj1MT05lAA',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMjIwMjE1Nzc4NV5BMl5BanBnXkFtZTgwNDg4OTA1NzM@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'aladdin-2019',
+                title: 'Aladdin',
+                year: '2019',
+                rating: '81% Match',
+                duration: '2h 8m',
+                description: 'A kindhearted street thief and a power-hungry Grand Vizier vie for a magic lamp that has the power to make their deepest wishes come true.',
+                trailerUrl: 'pKhDp_yuXwc',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMjQ2ODIyMjY4MF5BMl5BanBnXkFtZTgwNzY4ODI2NzM@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'captain-marvel',
+                title: 'Captain Marvel',
+                year: '2019',
+                rating: '84% Match',
+                duration: '2h 3m',
+                description: 'Carol Danvers becomes one of the universe\'s most powerful heroes when Earth is caught in the middle of a galactic war between two alien races.',
+                trailerUrl: 'Z1BCujX3pw8',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMTE0YWFmOTMtYTU2ZS00ZTIxLWE3OTEtYTNiYzBkZjViZThiXkEyXkFqcGdeQXVyODMzMzQ4OTI@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'us',
+                title: 'Us',
+                year: '2019',
+                rating: '86% Match',
+                duration: '1h 56m',
+                description: 'A family\'s serene beach vacation turns to chaos when their doppelgängers appear and begin to terrorize them.',
+                trailerUrl: 'hNCmb-4oXJA',
+                poster: 'https://m.media-amazon.com/images/M/MV5BZTliNWJhM2YtNDc1MC00YTk1LWE2MGYtZmE4M2Y5ODdlNzQzXkEyXkFqcGdeQXVyMzY0MTE3NzU@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'glass',
+                title: 'Glass',
+                year: '2019',
+                rating: '79% Match',
+                duration: '2h 9m',
+                description: 'Security guard David Dunn uses his supernatural abilities to track Kevin Wendell Crumb, a disturbed man who has twenty-four personalities.',
+                trailerUrl: '95ghQs5AmNk',
+                poster: 'https://m.media-amazon.com/images/M/MV5BNjE5NDI1Mjk2NF5BMl5BanBnXkFtZTgwNzEzNDI1NjM@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'aquaman',
+                title: 'Aquaman',
+                year: '2018',
+                rating: '85% Match',
+                duration: '2h 23m',
+                description: 'Arthur Curry, the human-born heir to the underwater kingdom of Atlantis, goes on a quest to prevent a war between the worlds of ocean and land.',
+                trailerUrl: 'WDkg3h8PCVU',
+                poster: 'https://m.media-amazon.com/images/M/MV5BOTk5ODg0OTU5M15BMl5BanBnXkFtZTgwMDQ3MDY3NjM@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'bohemian-rhapsody',
+                title: 'Bohemian Rhapsody',
+                year: '2018',
+                rating: '88% Match',
+                duration: '2h 14m',
+                description: 'The story of the legendary British rock band Queen and lead singer Freddie Mercury, leading up to their famous performance at Live Aid (1985).',
+                trailerUrl: 'mP0VHJYFOAU',
+                poster: 'https://m.media-amazon.com/images/M/MV5BNDg2NjIxODUtYzQzNC00ZWNlLWE4NDItNTQ5NDYxZjY0MjEzXkEyXkFqcGdeQXVyNjg2NjQwMDQ@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'venom',
+                title: 'Venom',
+                year: '2018',
+                rating: '82% Match',
+                duration: '1h 52m',
+                description: 'A failed reporter is bonded to an alien entity, one of many symbiotes who have invaded Earth. But the being takes a liking to Earth and decides to protect it.',
+                trailerUrl: 'u9Mv98Gr5pY',
+                poster: 'https://m.media-amazon.com/images/M/MV5BNzAwNzUzNjY4MV5BMl5BanBnXkFtZTgwMTQ5MzM0NjM@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'a-star-is-born',
+                title: 'A Star Is Born',
+                year: '2018',
+                rating: '90% Match',
+                duration: '2h 16m',
+                description: 'A musician helps a young singer find fame as age and alcoholism send his own career into a downward spiral.',
+                trailerUrl: 'nSbzyEJ8X9E',
+                poster: 'https://m.media-amazon.com/images/M/MV5BNmE5ZmE3OGItNTdlNC00YmMxLWEzNjctYzAwOGQ5ODg0OTI0XkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'mission-impossible-fallout',
+                title: 'Mission: Impossible – Fallout',
+                year: '2018',
+                rating: '91% Match',
+                duration: '2h 27m',
+                description: 'Ethan Hunt and his IMF team, along with some familiar allies, race against time after a mission gone wrong.',
+                trailerUrl: 'wb49-oV0F78',
+                poster: 'https://m.media-amazon.com/images/M/MV5BNjRlZmM0ODktY2RjNS00ZDdjLWJhZGYtNDljNWZkMGM5MTg0XkEyXkFqcGdeQXVyNjAwMjI5MDk@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'incredibles-2',
+                title: 'Incredibles 2',
+                year: '2018',
+                rating: '89% Match',
+                duration: '2h 5m',
+                description: 'The Incredibles hero family takes on a new mission, which involves a change in family roles: Bob Parr (Mr. Incredible) must manage the house while his wife Helen (Elastigirl) goes out to save the world.',
+                trailerUrl: 'i5qOzqD9Rms',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMTEzNzY0OTg0NTdeQTJeQWpwZ15BbWU4MDU3OTg3MjUz@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'deadpool-2',
+                title: 'Deadpool 2',
+                year: '2018',
+                rating: '87% Match',
+                duration: '1h 59m',
+                description: 'Foul-mouthed mutant mercenary Wade Wilson (a.k.a. Deadpool) brings together a team of fellow mutant rogues to protect a young boy with supernatural abilities from the brutal, time-traveling cyborg Cable.',
+                trailerUrl: 'D86RtevtfrA',
+                poster: 'https://m.media-amazon.com/images/M/MV5BNjk1Njk3YjctMTMzMC00ZjUyLWI0MjQtMzE1ZDc5NjVhMjgzXkEyXkFqcGdeQXVyODM2ODEzMDA@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'avengers-infinity-war',
+                title: 'Avengers: Infinity War',
+                year: '2018',
+                rating: '94% Match',
+                duration: '2h 29m',
+                description: 'The Avengers and their allies must be willing to sacrifice all in an attempt to defeat the powerful Thanos before his blitz of devastation and ruin puts an end to the universe.',
+                trailerUrl: '6ZfuNTqbHE8',
+                poster: 'https://m.media-amazon.com/images/M/MV5BMjMxNjY2MDU1OV5BMl5BanBnXkFtZTgwNzY1MTUwNTM@._V1_FMjpg_UX1000_.jpg'
+            },
+            {
+                id: 'solo',
+                title: 'Solo: A Star Wars Story',
+                year: '2018',
+                rating: '83% Match',
+                duration: '2h 15m',
+                description: 'During an adventure into the criminal underworld, Han Solo meets his future co-pilot Chewbacca and encounters Lando Calrissian years before joining the Rebellion.',
+                trailerUrl: 'jPEYpryMp2s',
+                poster: 'https://m.media-amazon.com/images/M/MV5BOTM2NTI3NTc3Nl5BMl5BanBnXkFtZTgwNzM1OTI2NTM@._V1_FMjpg_UX1000_.jpg'
+            }
+        ];
+
+        // Current movie and search state
+        let currentMovie = null;
+        let allMovies = [...moviesDatabase];
+        let filteredMovies = [...moviesDatabase];
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMovies();
+            setupEventListeners();
+            setupHeaderScroll();
+        });
+
+        function setupEventListeners() {
+            // Close modal when clicking outside
+            document.getElementById('video-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeModal();
+                    hideSearchResults();
+                }
+            });
+
+            // Click outside search to hide results
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.search-container')) {
+                    hideSearchResults();
+                }
+            });
+        }
+
+        function setupHeaderScroll() {
+            window.addEventListener('scroll', function() {
+                const header = document.getElementById('header');
+                if (window.scrollY > 100) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+        }
+
+        function loadMovies(movies = allMovies) {
+            showLoading();
+            
+            setTimeout(() => {
+                const moviesGrid = document.getElementById('movies-grid');
+                const noResults = document.getElementById('no-results');
+                
+                moviesGrid.innerHTML = '';
+                
+                if (movies.length === 0) {
+                    noResults.style.display = 'block';
+                    moviesGrid.style.display = 'none';
+                } else {
+                    noResults.style.display = 'none';
+                    moviesGrid.style.display = 'grid';
+                    
+                    movies.forEach(movie => {
+                        const movieCard = createMovieCard(movie);
+                        moviesGrid.appendChild(movieCard);
+                    });
+                }
+                
+                hideLoading();
+            }, 500);
+        }
+
+        function createMovieCard(movie) {
+            const movieCard = document.createElement('div');
+            movieCard.className = 'movie-card fade-in';
+            movieCard.onclick = () => showMovieModal(movie);
+            
+            movieCard.innerHTML = `
+                <div class="movie-poster">
+                    <img src="${movie.poster}" alt="${movie.title}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1489599162163-3fb2b8e4b5b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'">
+                    <div class="quality-badge">HD</div>
+                </div>
+                <div class="movie-info">
+                    <div class="movie-title">${movie.title}</div>
+                    <div class="movie-meta">
+                        <span class="movie-rating">${movie.rating}</span>
+                        <span>${movie.year}</span>
+                        <span>${movie.duration}</span>
+                    </div>
+                    <div class="movie-description">${movie.description}</div>
+                </div>
+            `;
+            
+            return movieCard;
+        }
+
+        function searchMovies(query) {
+            const searchResults = document.getElementById('search-results');
+            
+            if (query.trim() === '') {
+                hideSearchResults();
+                showAllMovies();
+                return;
+            }
+
+            // Filter movies based on search query
+            filteredMovies = allMovies.filter(movie => 
+                movie.title.toLowerCase().includes(query.toLowerCase()) ||
+                movie.description.toLowerCase().includes(query.toLowerCase()) ||
+                movie.year.includes(query)
+            );
+
+            // Show search results dropdown
+            if (filteredMovies.length > 0) {
+                const limitedResults = filteredMovies.slice(0, 5);
+                searchResults.innerHTML = '';
+                
+                limitedResults.forEach(movie => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'search-result-item';
+                    resultItem.innerHTML = `
+                        <strong>${movie.title}</strong> (${movie.year})
+                    `;
+                    resultItem.onclick = () => {
+                        showMovieModal(movie);
+                        hideSearchResults();
+                        document.getElementById('search-bar').value = '';
+                    };
+                    searchResults.appendChild(resultItem);
+                });
+                
+                searchResults.style.display = 'block';
+            } else {
+                searchResults.innerHTML = '<div class="search-result-item">No movies found</div>';
+                searchResults.style.display = 'block';
+            }
+
+            // Update main grid
+            loadMovies(filteredMovies);
+            document.getElementById('section-title').textContent = `Search Results (${filteredMovies.length})`;
+        }
+
+        function hideSearchResults() {
+            document.getElementById('search-results').style.display = 'none';
+        }
+
+        function showAllMovies() {
+            filteredMovies = [...allMovies];
+            loadMovies(filteredMovies);
+            document.getElementById('section-title').textContent = 'All Movies';
+            document.getElementById('search-bar').value = '';
+        }
+
+        function showMovieModal(movie) {
+            currentMovie = movie;
+            
+            // Update modal content
+            document.getElementById('modal-title').textContent = movie.title;
+            document.getElementById('modal-rating').textContent = movie.rating;
+            document.getElementById('modal-year').textContent = movie.year;
+            document.getElementById('modal-duration').textContent = movie.duration;
+            document.getElementById('modal-description').textContent = movie.description;
+            
+            // Load trailer
+            loadTrailer(movie.trailerUrl);
+            
+            // Show modal
+            document.getElementById('video-modal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function loadTrailer(videoId) {
+            const videoContainer = document.getElementById('video-container');
+            videoContainer.innerHTML = `
+                <iframe 
+                    src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            `;
+        }
+
+        function closeModal() {
+            document.getElementById('video-modal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            
+            // Stop video
+            document.getElementById('video-container').innerHTML = '';
+            currentMovie = null;
+        }
+
+        function playTrailer() {
+            if (currentMovie) {
+                // Remove mute for full playback
+                const videoContainer = document.getElementById('video-container');
+                videoContainer.innerHTML = `
+                    <iframe 
+                        src="https://www.youtube.com/embed/${currentMovie.trailerUrl}?autoplay=1&controls=1&rel=0&modestbranding=1" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                `;
+            }
+        }
+
+        function playFeaturedContent() {
+            const featuredMovie = moviesDatabase.find(movie => movie.id === 'stranger-things');
+            if (featuredMovie) {
+                showMovieModal(featuredMovie);
+            }
+        }
+
+        function showMovieInfo(movieId) {
+            const movie = moviesDatabase.find(m => m.id === movieId);
+            if (movie) {
+                showMovieModal(movie);
+            }
+        }
+
+        function addToList() {
+            if (currentMovie) {
+                // Simulate adding to list
+                const button = document.querySelector('.modal-list-btn');
+                const originalText = button.innerHTML;
+                button.innerHTML = '<svg style="width: 20px; height: 20px; fill: currentColor;" viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg> Added';
+                button.style.background = '#46d369';
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.style.background = 'rgba(109,109,110,0.7)';
+                }, 2000);
+            }
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        // Prevent right-click context menu
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        // Auto-rotate hero background
+        const heroBackgrounds = [
+            'https://images.unsplash.com/photo-1489599162163-3fb2b8e4b5b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+            'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+            'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+            'https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'
+        ];
+
+        let currentBgIndex = 0;
+        setInterval(() => {
+            currentBgIndex = (currentBgIndex + 1) % heroBackgrounds.length;
+            const heroSection = document.querySelector('.hero-section');
+            heroSection.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('${heroBackgrounds[currentBgIndex]}')`;
+        }, 8000);
+    </script>
+</body>
+</html>
